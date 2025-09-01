@@ -20,7 +20,7 @@
 
       <!-- Tombol kembali -->
       <RouterLink
-        to="/"
+        to="/login"
         class="mt-8 inline-block px-6 py-3 text-lg font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:shadow-xl hover:bg-indigo-500 transition transform hover:-translate-y-1"
       >
         ⬅ Kembali ke Beranda

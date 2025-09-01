@@ -1,4 +1,4 @@
-// src/stores/useAuthStore.js
+// useAuthStore.js
 import { defineStore } from "pinia";
 import { supabase } from "../lib/supabase";
 
@@ -9,7 +9,7 @@ export const useAuthStore = defineStore("auth", {
     loading: false,
   }),
   getters: {
-    isAuthenticated: (state) => !!state.user,
+    isLoggedIn: (state) => !!state.user,
     userRole: (state) => state.user?.role || null,
   },
   actions: {
@@ -17,21 +17,25 @@ export const useAuthStore = defineStore("auth", {
       this.loading = true;
       this.error = null;
       try {
-        const { data, error } = await supabase
-          .from("user") // pastikan tabelnya "user"
-          .select("*")
-          .eq("email", email)
-          .eq("password", password) // kalau masih plaintext, lebih baik nanti pakai hash
-          .single();
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-        if (error || !data) {
-          this.error = "Email atau password salah";
+        if (error) {
+          this.error = error.message;
           return false;
         }
 
-        this.user = data;
-        localStorage.setItem("user", JSON.stringify(data));
-        localStorage.setItem("user_id", data.user_id); // simpan id saja kalau perlu
+        const { data: profile, error: profileError } = await supabase
+          .from("user")
+          .select("user_id, email, role")
+          .eq("user_id", data.user.id) 
+          .single();
+
+        this.user = { ...profile };
+        localStorage.setItem("user", JSON.stringify(this.user));
+
         return true;
       } catch (err) {
         this.error = "Terjadi kesalahan server";
@@ -42,10 +46,10 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    logout() {
+    async logout() {
+      await supabase.auth.signOut();
       this.user = null;
       localStorage.removeItem("user");
-      localStorage.removeItem("user_id");
     },
   },
 });

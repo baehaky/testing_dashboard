@@ -67,7 +67,7 @@ const handleLogin = async () => {
     } else if (authStore.user?.role === "Kontraktor") {
       router.push("/kontraktordashboard");
     } else {
-      router.push("/"); // fallback kalau role tidak dikenali
+      router.push("/");
     }
   }
 };

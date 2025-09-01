@@ -77,6 +77,7 @@ const router = createRouter({
 // Guard untuk proteksi route
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
+  console.log("Navigating to:", to.name, "from:", from.name);
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return next({ name: "login" });
